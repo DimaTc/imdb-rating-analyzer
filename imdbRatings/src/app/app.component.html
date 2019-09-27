@@ -1,0 +1,35 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<div style="text-align:center">
+  <h1>Welcome to {{ title }}!</h1>
+
+  <div class="d-flex flex-column justify-content-center">
+    <div class="container w-75">
+      <h3>
+        Search a series:
+      </h3>
+      <input
+        name="search"
+        type="text"
+        class="input-group"
+        (keyup)="searchChanged($event)"
+        [(ngModel)]="searchString"
+        autocomplete="off"
+      />
+
+      <div class="container">
+        <div class="search-result d-flex justify-content-evenly overflow-hidden" *ngFor="let item of searchResult">
+            <div class="d-flex" style="width: 300px">
+              <img class="flex-start" src={{item.imageUrl}} alt="asd" height="100" >
+            </div>
+            <div class="flex-center text-center d-flex flex-column w-50 align-self-center search-title">
+              <h4>{{item.title}}</h4>
+              <cite style="font-weight: normal">{{item.yearsActive}}</cite>
+            </div>
+
+            <div class="align-self-center flex-grow-1">Popularity <br>{{item.rank}}</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
