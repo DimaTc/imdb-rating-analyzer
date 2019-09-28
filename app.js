@@ -15,6 +15,7 @@ const imdbSearchData = (req, res, next) => {
     return;
   }
   let query = req.body.q;
+  if (query.length > 0) query = query.toLowerCase();
   if (query !== undefined && query.length > 0) {
     try {
       let url = `https://v2.sg.media-imdb.com/suggestion/${query[0]}/${query}.json`;
