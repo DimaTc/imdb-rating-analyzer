@@ -5,7 +5,7 @@ const cheerio = require("cheerio");
 const cors = require("cors");
 const app = express();
 
-const PORT = 8080;
+const port = process.env.port || 3001;
 
 app.use(express.static(__dirname + "/dist/imdbRatings"));
 
@@ -244,6 +244,6 @@ app.get("*", (req, res) => {
   res.sendFile("index.html");
 });
 
-app.listen(PORT, () => {
-  console.log(`listening on port ${PORT}...`);
+app.listen(port, () => {
+  console.log(`listening on port ${port}...`);
 });
