@@ -1,6 +1,8 @@
-import { SearchItem } from './components/search-item/SearchItem';
+import { SearchItem } from "./components/search-item/SearchItem";
 import { Component } from "@angular/core";
 import { SearchServiceService } from "./search-service.service";
+import { Season } from "./components/Season";
+import { Episode } from "./components/Episode";
 
 @Component({
   selector: "app-root",
@@ -9,31 +11,82 @@ import { SearchServiceService } from "./search-service.service";
 })
 export class AppComponent {
   title = "imdbRatings";
-  searchString: String;
-  dummySearchRes: SearchItem[];
-  searchResult = this.dummySearchRes;
-
+  searchString: string;
+  searchResult: SearchItem[];
+  selectedTitle: SearchItem;
+  isLoading: boolean;
+  error: string;
+  errorMessage: string;
   constructor(private searchService: SearchServiceService) {}
 
   searchChanged(event: KeyboardEvent) {
-    this.search();
+    if (this.searchString != undefined && this.searchString.trim().length > 0)
+      this.search();
+    else {
+      this.searchResult = undefined;
+      this.error = undefined;
+      this.errorMessage = undefined;
+    }
   }
 
   search() {
-    if (this.searchString != undefined && this.searchString.length > 0) this.searchService.search(this.searchString).subscribe(res=>{
-      if(res instanceof Array){
-        this.searchResult = res.map(item=>{
+    if (this.searchString != undefined && this.searchString.length > 0)
+      this.searchService.search(this.searchString).subscribe((res: any) => {
+        if (res instanceof Array) {
+          this.error = undefined;
+          this.errorMessage = undefined;
+          this.searchResult = res.map(item => {
+            return {
+              imageUrl: item.image,
+              title: item.title,
+              id: item.id,
+              rank: item.rank,
+              yearsActive: item.years
+            };
+          });
+        } else {
+          this.searchResult = [];
+          this.error = res.error;
+          this.errorMessage = res.errorMessage;
+        }
+      });
+  }
 
-          return {
-            imageUrl: item.image,
-            title: item.title,
-            id: item.id,
-            rank: item.rank,
-            yearsActive: item.years
-          };
-        })
-      }else
-      this.searchResult = [];
+  selectTitle(item: SearchItem) {
+    this.isLoading = true;
+    this.selectedTitle = item;
+    this.searchResult = [];
+    this.searchString = "";
+    this.searchService.loadTitle(item.id).subscribe((res: any) => {
+      if (res.id == undefined) return;
+      this.isLoading = false;
+      this.selectedTitle.rating = res.totalRating;
+      this.populateSeasons(res);
     });
+  }
+
+  populateSeasons(res: any) {
+    if (this.selectedTitle == undefined || !(res.seasons instanceof Array))
+      return;
+    this.selectedTitle.seasons = res.seasons.map((season: Season) => {
+      let avgRating = -1;
+      let numberOfRatedEpisode = 0;
+      season.episodes.forEach((episode: Episode) => {
+        if (episode.rating) {
+          numberOfRatedEpisode++;
+          avgRating =
+            episode.rating + (numberOfRatedEpisode == 0 ? 0 : avgRating);
+        }
+      });
+      avgRating =
+        numberOfRatedEpisode != 0
+          ? avgRating / numberOfRatedEpisode
+          : undefined;
+      return {
+        ...season,
+        avgRating: avgRating
+      };
+    });
+    console.log(this.selectedTitle);
   }
 }

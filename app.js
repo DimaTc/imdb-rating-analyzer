@@ -13,17 +13,32 @@ const imdbSearchData = (req, res, next) => {
   let query = req.body.q;
   if (query !== undefined && query.length > 0) {
     try {
-      let url = `https://v2.sg.media-imdb.com/suggestion/${query[0]}/${query}.json`;
-      axios.get(url).then(search => {
-        let allItems = search.data;
-        if (allItems.d != undefined) {
-          relevantItems = allItems.d.filter(item => {
-            return item.q != undefined && (item.q == "TV series" || item.q == "TV mini-series");
-          });
-          req.imdbData = relevantItems;
-          next();
-        }
-      });
+      let url = `https://v2.sg.media-imdb.com/suggestion/${
+        query[0]
+      }/${query}.json`;
+      axios
+        .get(url)
+        .then(search => {
+          let allItems = search.data;
+          if (allItems.d != undefined) {
+            relevantItems = allItems.d.filter(item => {
+              return (
+                item.q != undefined &&
+                (item.q == "TV series" || item.q == "TV mini-series")
+              );
+            });
+            req.imdbData = relevantItems;
+            next();
+          }
+        })
+        .catch(err => {
+          res.send(
+            JSON.stringify({
+              error: "Server Error",
+              errorMessage: err.response.data.message
+            })
+          );
+        });
     } catch (e) {
       console.log("Error! should do something");
       console.log("---------------------------");
@@ -44,53 +59,64 @@ const titleLoader = (req, res, next) => {
   let id = req.body.id;
   if (id !== undefined && id.length > 0) {
     let url = `https://www.imdb.com/title/${id}/`;
-    axios.get(url).then(bodyRaw => {
-      req.title = {};
-      let body = bodyRaw.data;
-      const $ = cheerio.load(body);
-      let seasons = [];
-      let seasonElem = $(".seasons-and-year-nav")
-        .children()
-        .get(3);
-      $(seasonElem)
-        .children()
-        .each((i, e) => {
-          var tmp = $(e).text();
-          if (req.maxSeason == undefined || tmp * 1 > req.maxSeason) req.maxSeason = tmp * 1;
-          seasons.push(tmp * 1); //easy conversion to int.
-        });
-      seasons.reverse();
-      // req.titleId
-
-      let titleTotalRatingElem = $(".ratingValue")
-        .children()
-        .get(0);
-      req.title.totalRating = $(titleTotalRatingElem).text();
-      // req.totalRating = $(titleTotalRatingElem).text();
-
-      let titleDiv = $(".title_wrapper")
-        .children()
-        .get(0);
-      req.title.name = $(titleDiv)
-        .text()
-        .trim();
-      // req.titleName = $(titleDiv).text();
-
-      let imageDiv = $(
-        $(".poster")
+    axios
+      .get(url)
+      .then(bodyRaw => {
+        req.title = {};
+        let body = bodyRaw.data;
+        const $ = cheerio.load(body);
+        let seasons = [];
+        let seasonElem = $(".seasons-and-year-nav")
           .children()
-          .get(0)
-      )
-        .children()
-        .get(0);
-      req.title.imageUrl = $(imageDiv).attr("src");
+          .get(3);
+        $(seasonElem)
+          .children()
+          .each((i, e) => {
+            var tmp = $(e).text();
+            if (req.maxSeason == undefined || tmp * 1 > req.maxSeason)
+              req.maxSeason = tmp * 1;
+            seasons.push(tmp * 1); //easy conversion to int.
+          });
+        seasons.reverse();
+        // req.titleId
 
-      // req.titleId = id;
-      req.title.id = id;
-      // req.seasons = seasons
-      req.title.seasons = seasons;
-      next();
-    });
+        let titleTotalRatingElem = $(".ratingValue")
+          .children()
+          .get(0);
+        req.title.totalRating = $(titleTotalRatingElem).text();
+        // req.totalRating = $(titleTotalRatingElem).text();
+
+        let titleDiv = $(".title_wrapper")
+          .children()
+          .get(0);
+        req.title.name = $(titleDiv)
+          .text()
+          .trim();
+        // req.titleName = $(titleDiv).text();
+
+        let imageDiv = $(
+          $(".poster")
+            .children()
+            .get(0)
+        )
+          .children()
+          .get(0);
+        req.title.imageUrl = $(imageDiv).attr("src");
+
+        // req.titleId = id;
+        req.title.id = id;
+        // req.seasons = seasons
+        req.title.seasons = seasons;
+        next();
+      })
+      .catch(err => {
+        res.send(
+          JSON.stringify({
+            error: "Server Error",
+            error_message: err.data
+          })
+        );
+      });
   } else {
     console.log("titleLoader: invalid ID");
     console.log(req.body);
@@ -124,7 +150,9 @@ const loadRatings = (titleId, maxSeason) => {
         // seasonArray.map(async item => {
         let season = {};
         season.number = i;
-        let res = await axios.get(`https://www.imdb.com/title/${titleId}/episodes?season=${i}`);
+        let res = await axios.get(
+          `https://www.imdb.com/title/${titleId}/episodes?season=${i}`
+        );
         let $ = cheerio.load(res.data);
         let episodes = [];
         $(".eplist")
@@ -138,11 +166,13 @@ const loadRatings = (titleId, maxSeason) => {
             let ratingTmp = $(elem)
               .find(".ipl-rating-star__rating")
               .html();
-            if (ratingTmp != undefined && ratingTmp.length > 0) episode.rating = ratingTmp * 1;
+            if (ratingTmp != undefined && ratingTmp.length > 0)
+              episode.rating = ratingTmp * 1;
             let votes = $(elem)
               .find(".ipl-rating-star__total-votes")
               .html();
-            if (votes != undefined && votes.length > 0) episode.votes = votes.replace(/[\(\)\,]/g, "") * 1;
+            if (votes != undefined && votes.length > 0)
+              episode.votes = votes.replace(/[\(\)\,]/g, "") * 1;
 
             episodes.push(episode);
           });
@@ -178,7 +208,10 @@ app.post("/api/search", (req, res) => {
       id: item.id,
       title: item.l,
       rank: item.rank,
-      image: item.i != undefined ? item.i.imageUrl : "https://api.ballotpedia.org/v3/thumbnail/",
+      image:
+        item.i != undefined
+          ? item.i.imageUrl
+          : "https://api.ballotpedia.org/v3/thumbnail/",
       years: item.yr
     }));
 

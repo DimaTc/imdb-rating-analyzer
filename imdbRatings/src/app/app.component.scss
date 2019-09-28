@@ -1,23 +1,44 @@
-$color-sec: lightgray;
-.search-result{
-    color:darken($color: $color-sec, $amount: 10%);
-    list-style: none;
-    font-weight: bold;
-    border: 1px solid $color-sec;
-    border-radius: 1em;
-    width:100%;
-    margin: 0.5em 0 0.5em 0;
-    padding:0;
+$color-sec: lighten(lightgray, 15%);
+$btn-color: rgb(219, 200, 89);
+.search-result {
+  color: darken($color: $color-sec, $amount: 10%);
+  list-style: none;
+  font-weight: bold;
+  border: 1px solid $color-sec;
+  border-radius: 1em;
+  width: 100%;
+  margin: 0.5em 0 0.5em 0;
+  padding: 0;
+  cursor: pointer;
+  user-select: none;
+  transition: 0.3s background-color;
+  background-color: lighten(invert($color-sec), 25%);
+  &:hover {
+    background-color: lighten(invert($color-sec), 15%);
+  }
+  div {
+    color: $color-sec;
+  }
 
-    div{
-        color:$color-sec;
+  .search-title {
+    color: darken($color: $color-sec, $amount: 20%);
+    h4 {
+      font-weight: bold;
+      color: darken($color: $color-sec, $amount: 35%);
     }
+  }
+}
 
-    .search-title{
-        color:darken($color: $color-sec, $amount: 20%);
-        h4{
-            font-weight: bold;
-            color:darken($color: $color-sec, $amount: 35%);
-        }
-    }
+.season {
+  border-radius: 0.2em;
+  background-color: $btn-color;
+  color: invert($color: $btn-color);
+  border: 2px solid darken($color: $btn-color, $amount: 20%);
+  cursor: pointer;
+  user-select: none;
+  font-weight: bold;
+
+  &:hover {
+    background-color: darken($color: $btn-color, $amount: 10%);
+  }
 }
