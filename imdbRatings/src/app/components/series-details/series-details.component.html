@@ -1,0 +1,27 @@
+<div class="d-flex w-75 details ml-auto mr-auto mb-2 mt-3 flex-column">
+  <div class="series-name text-center m-auto">
+    {{ title.title }}
+  </div>
+  <div class="d-flex justify-content-around ">
+    <div class="info">
+      Best episode:&nbsp;
+      <span> s{{ info.topRated.season.number }}e{{ info.topRated.episode.number }} ({{ info.topRated.episode.rating }})</span>
+    </div>
+    <div class="info">
+      Most voted episode:&nbsp;
+      <span> s{{ info.mostVoted.season.number }}e{{ info.mostVoted.episode.number }} ({{ info.mostVoted.episode.votes }}) </span>
+    </div>
+  </div>
+  <div class="d-flex justify-content-around">
+    <div class="info">
+      Worst episode:&nbsp;
+      <span> s{{ info.worst.season.number }}e{{ info.worst.episode.number }} ({{ info.worst.episode.rating }})</span>
+    </div>
+    <div class="info">
+      Least voted episode:&nbsp;
+      <span>
+        s{{ info.leastVoted.season.number }}e{{ info.leastVoted.episode.number }} ({{ info.leastVoted.episode.votes }})</span
+      >
+    </div>
+  </div>
+</div>

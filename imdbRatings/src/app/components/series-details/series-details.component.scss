@@ -1,0 +1,15 @@
+.details {
+  border: 2px solid black;
+  border-radius: 0.5em;
+  .series-name {
+    font-size: 2.5em;
+    font-weight: bold;
+  }
+  .info {
+    font-size: 1.2em;
+
+    span {
+      font-weight: bold;
+    }
+  }
+}

@@ -23,23 +23,14 @@
           (click)="selectTitle(item)"
         >
           <div class="d-flex" style="width: 300px">
-            <img
-              class="flex-start"
-              src="{{ item.imageUrl }}"
-              alt="asd"
-              height="100"
-            />
+            <img class="flex-start" src="{{ item.imageUrl }}" alt="asd" height="100" />
           </div>
-          <div
-            class="flex-center text-center d-flex flex-column w-50 align-self-center search-title"
-          >
+          <div class="flex-center text-center d-flex flex-column w-50 align-self-center search-title">
             <h4>{{ item.title }}</h4>
             <cite style="font-weight: normal">{{ item.yearsActive }}</cite>
           </div>
 
-          <div class="align-self-center flex-grow-1">
-            Popularity <br />{{ item.rank }}
-          </div>
+          <div class="align-self-center flex-grow-1">Popularity <br />{{ item.rank }}</div>
         </div>
         <div *ngIf="error" class="alert alert-danger mt-5">
           {{ error }}
@@ -52,20 +43,23 @@
 </div>
 
 <div *ngIf="selectedTitle" class="container w-75 ml-auto">
+
   <div class="container">
     <h1 class="text-center" *ngIf="isLoading; else notLoading">Loading...</h1>
     <ng-template #notLoading>
-      <div class="d-flex content-justify-start flex-wrap">
+    <series-details [title]="selectedTitle"></series-details>
+
+      <div class="d-flex justify-content-center flex-wrap">
         <div
           class="season m-2 p-2 pt-1 pb-1"
-          *ngFor="let season of selectedTitle.seasons"
+          *ngFor="let season of seasonButtons"
+          [ngClass]="{ disabled: season.avgRating == undefined }"
+          (click)="selectSeason(season)"
         >
-          Season {{ season.number }} &nbsp;&nbsp; ({{
-            season.avgRating | number: "1.1-1"
-          }})
+          Season {{ season.number }} &nbsp;&nbsp; ({{ season.avgRating | number: "1.1-1" }})
         </div>
       </div>
+      <graph [title]="selectedTitle" [season]=selectedSeason></graph>
     </ng-template>
   </div>
-  <!-- <graph></graph> -->
 </div>

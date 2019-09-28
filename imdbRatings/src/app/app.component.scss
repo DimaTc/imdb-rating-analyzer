@@ -1,5 +1,6 @@
 $color-sec: lighten(lightgray, 15%);
 $btn-color: rgb(219, 200, 89);
+$btn-color-disabled: rgb(173, 173, 173);
 .search-result {
   color: darken($color: $color-sec, $amount: 10%);
   list-style: none;
@@ -41,4 +42,9 @@ $btn-color: rgb(219, 200, 89);
   &:hover {
     background-color: darken($color: $btn-color, $amount: 10%);
   }
+}
+.disabled{
+  background-color:$btn-color-disabled;
+  color: invert($color: $btn-color-disabled);
+  border-color: darken($color: $btn-color-disabled, $amount: 20%);
 }

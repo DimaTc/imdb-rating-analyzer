@@ -7,9 +7,10 @@ import { HttpClientModule } from "@angular/common/http";
 
 import { GraphComponent } from "./components/graph/graph.component";
 import { SearchItemComponent } from "./components/search-item/search-item.component";
+import { SeriesDetailsComponent } from './components/series-details/series-details.component';
 
 @NgModule({
-  declarations: [AppComponent, GraphComponent, SearchItemComponent],
+  declarations: [AppComponent, GraphComponent, SearchItemComponent, SeriesDetailsComponent],
   imports: [BrowserModule, FormsModule, HttpClientModule, MDBBootstrapModule.forRoot()],
   providers: [],
   bootstrap: [AppComponent]

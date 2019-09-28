@@ -1,36 +1,94 @@
-import { Component, OnInit } from '@angular/core';
+import { Season } from "./../Season";
+import { SearchItem } from "./../search-item/SearchItem";
+import { Component, OnInit, Input } from "@angular/core";
 
 @Component({
-  selector: 'graph',
-  templateUrl: './graph.component.html',
-  styleUrls: ['./graph.component.scss']
+  selector: "graph",
+  templateUrl: "./graph.component.html",
+  styleUrls: ["./graph.component.scss"]
 })
-export class GraphComponent  {
-  public chartType: string = 'line';
+export class GraphComponent implements OnInit {
+  @Input() title: SearchItem;
+  // @Input() season: Season;
+  @Input()
+  set season(season: Season) {
+    if (season == undefined) this.updateGraphData(this.title.seasons);
+    else this.updateGraphData([season]);
+  }
 
-  public chartDatasets: Array<any> = [
-    { data: [65, 59, 80, 81, 56, 55, 40], label: 'My First dataset' },
-    { data: [28, 48, 40, 19, 35, 27, 90], label: 'My Second dataset' }
-  ];
+  get season(): Season {
+    return this.season;
+  }
+  _season: Season;
+  chartDatasets: Array<any> = [{}, {}];
+  chartLabels: Array<any> = [];
 
-  public chartLabels: Array<any> = ['asd', 'dsa', 'zzz', 'ccApril', 'a', 'Junew', 'Julyasd'];
+  ngOnInit() {
+    if (this._season == undefined) this.updateGraphData(this.title.seasons);
+    else {
+      this.updateGraphData([this._season]);
+    }
+  }
+
+  updateGraphData(seasons: Season[]) {
+    this.chartDatasets = [{}, {}];
+    this.chartLabels = [];
+    seasons.forEach(season => {
+      if (season == undefined) return;
+      season.episodes.forEach(episode => {
+        if (!episode.rating) return;
+        if (this.chartDatasets[0].data == undefined) {
+          this.chartDatasets[0] = {
+            data: [episode.rating],
+            label: "Rating",
+            yAxisID: "rate"
+          };
+          this.chartDatasets[1] = {
+            data: [episode.votes],
+            label: "votes",
+            yAxisID: "vote"
+          };
+        } else {
+          this.chartDatasets[0].data.push(episode.rating);
+          this.chartDatasets[1].data.push(episode.votes);
+        }
+        this.chartLabels = [...this.chartLabels, `s${season.number}e${episode.number}`];
+      });
+    });
+  }
+
+  public chartType: string = "line";
 
   public chartColors: Array<any> = [
     {
-      backgroundColor: 'rgba(105, 0, 132, .2)',
-      borderColor: 'rgba(200, 99, 132, .7)',
-      borderWidth: 2,
+      backgroundColor: "rgba(105, 0, 132, .2)",
+      borderColor: "rgba(200, 99, 132, .7)",
+      borderWidth: 2
     },
     {
-      backgroundColor: 'rgba(0, 137, 132, .2)',
-      borderColor: 'rgba(0, 10, 130, .7)',
-      borderWidth: 2,
+      backgroundColor: "rgba(0, 137, 132, .2)",
+      borderColor: "rgba(0, 10, 130, .7)",
+      borderWidth: 2
     }
   ];
 
   public chartOptions: any = {
-    responsive: true
+    responsive: true,
+    scales: {
+      yAxes: [
+        {
+          id: "rate",
+          type: "linear",
+          position: "left"
+        },
+        {
+          id: "vote",
+          type: "linear",
+          position: "right"
+        }
+      ]
+    }
   };
-  public chartClicked(e: any): void { }
-  public chartHovered(e: any): void { }
+  public chartClicked(e: any): void {}
+  public chartHovered(e: any): void {}
 }
