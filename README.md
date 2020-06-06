@@ -1,6 +1,9 @@
 # imdb-rating-analyzer
 It will show rating analytics of selected shows.
 [Link to the project](https://imdb-analytics.herokuapp.com/)
+
+![Preview of the site](https://i.imgur.com/RsfAJq4.png)
+
 ## Installation
 
 ```bash
